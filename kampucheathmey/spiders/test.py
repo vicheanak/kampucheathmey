@@ -1,51 +1,51 @@
 # -*- coding: utf-8 -*-
 import scrapy
 from scrapy.spiders import CrawlSpider, Rule
-from thmeythmey.items import ThmeythmeyItem
+from kampucheathmey.items import KampucheathmeyItem
 from scrapy.linkextractors import LinkExtractor
 import time
 
 
 class TestSpider(CrawlSpider):
-    name = "thmeythmey"
-    allowed_domains = ["thmeythmey.com"]
+    name = "kampucheathmey"
+    allowed_domains = ["kampucheathmey.com"]
     start_urls = [
-    'https://thmeythmey.com/?page=location&menu1=3&ref_id=9&ctype=article&id=3&lg=kh',
+    'https://kampucheathmey.com/2016/ព័ត៌មានជាតិ/ព័ត៌មានជាតិទូទៅ',
     ]
 
     def parse(self, response):
         now = time.strftime('%Y-%m-%d %H:%M:%S')
         hxs = scrapy.Selector(response)
 
-        articles = hxs.xpath('//div[@class="news_icon"]')
+        articles = hxs.xpath('//div[@class="feature-post-list"]')
 
         for article in articles:
-            item = ThmeythmeyItem()
+            item = KampucheathmeyItem()
             item['categoryId'] = '1'
-            name = article.xpath('div[contains(@class, "title_item_news")]/span[1]/a[1]/text()')
+            name = article.xpath('div[@class="post_loop_content"][1]/h3[1]/a[1]/text()')
             if not name:
-                print('ThmeyThmey => [' + now + '] No title')
+                print('Kampucheathmey => [' + now + '] No title')
             else:
                 item['name'] = name.extract_first()
 
-            url = article.xpath('div[contains(@class, "title_item_news")]/span[1]/a[1]/@href')
+            url = article.xpath('div[@class="post_loop_content"][1]/h3[1]/a[1]/@href')
             if not url:
-                print('ThmeyThmey => [' + now + '] No url')
+                print('Kampucheathmey => [' + now + '] No url')
             else:
-                item['url'] = 'https://thmeythmey.com/' + url.extract_first()
+                item['url'] = url.extract_first()
 
-            description = article.xpath('div[contains(@class, "short_detail_ctn")]/span[1]/text()')
+            description = article.xpath('div[@class="post_loop_content"][1]/p[@class="post_des"][1]/text()')
             if not description:
-                print('ThmeyThmey => [' + now + '] No description')
+                print('Kampucheathmey => [' + now + '] No description')
             else:
                 item['description'] = description.extract_first()
 
             imageUrl = article.xpath("""
-                a[1]/div[1]/@data-src
+                div[@class="image_post feature-item loadmore_list_image"]/a[1]/img[1]/@src
                 """)
 
             if not imageUrl:
-                print('ThmeyThmey => [' + now + '] No imageUrl')
+                print('Kampucheathmey => [' + now + '] No imageUrl')
             else:
                 item['imageUrl'] = imageUrl.extract_first()
 
@@ -59,13 +59,13 @@ class TestSpider(CrawlSpider):
         item_page = hxs.css('div.item-page')
         description = item_page.xpath('p[1]/text()')
         if not description:
-            print('ThmeyThmey => [' + now + '] No description')
+            print('Kampucheathmey => [' + now + '] No description')
         else:
             item['description'] = item_page.xpath('p[1]/strong/text()').extract_first() + ' ' + description.extract_first()
 
         imageUrl = item_page.xpath('p[last()]/img/@src')
         if not imageUrl:
-            print('ThmeyThmey => [' + now + '] No imageUrl')
+            print('Kampucheathmey => [' + now + '] No imageUrl')
         else:
             item['imageUrl'] = imageUrl.extract_first()
 
