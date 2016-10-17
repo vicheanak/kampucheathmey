@@ -44,6 +44,7 @@ class TestSpider(CrawlSpider):
                 div[@class="image_post feature-item loadmore_list_image"]/a[1]/img[1]/@src
                 """)
 
+            item['imageUrl']
             if not imageUrl:
                 print('Kampucheathmey => [' + now + '] No imageUrl')
             else:
